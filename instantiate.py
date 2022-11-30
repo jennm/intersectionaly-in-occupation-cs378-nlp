@@ -9,7 +9,7 @@ import random
 
 # python instantiate.py
 
-races = ["", "Black", "White", "Asian", "Hispanic", "Indigenous"]
+races = ["", "Black ", "White ", "Asian ", "Hispanic ", "Indigenous "]
 genders = ["male", "female", "neutral"]
 
 
@@ -70,93 +70,50 @@ def get_formatted_sentences(train_test_split=0.8, race_blind=True, to_print=Fals
 
     random.shuffle(S)
     split_point = int(len(S) * train_test_split)
-    training_data = list()
+    # training_data = list()
     testing_data = list()
-    training_answers = list()
+    training_occupation_sent = list()
+    training_occupation_some1 = list()
+    training_participant_sent = list()
+    training_participant_some1 = list()
+    # training_answers = list()
     testing_answers = list()
+    count = 0
 
-    for s in S[0: split_point]:
-        if race_blind:
-            occupation, other_participant, answer, sentence = s
+    for s in S:
+        _occupation, _other_participant, answer, sentence = s
+        print(answer)
+        male_sent, female_sent, neutral_sent = generate(
+            _occupation, _other_participant, answer, sentence)
+        male_sentid, female_sentid, neutral_sentid = [_occupation+'.'+_other_participant+'.'+str(
+            answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
 
-            male_sent, female_sent, neutral_sent = generate(
-                occupation, other_participant, answer, sentence)
-            male_sentid, female_sentid, neutral_sentid = [occupation+'.'+other_participant+'.'+str(
-                answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
+        male_sent_some1, female_sent_some1, neutral_sent_some1 = generate(
+            _occupation, _other_participant, answer, sentence, someone=True)
+        male_sentid_some1, female_sentid_some1, neutral_sentid_some1 = [
+            _occupation+'.'+"someone"+'.'+str(answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
 
-            male_sent_some1, female_sent_some1, neutral_sent_some1 = generate(
-                occupation, other_participant, answer, sentence, someone=True)
-            male_sentid_some1, female_sentid_some1, neutral_sentid_some1 = [
-                occupation+'.'+"someone"+'.'+str(answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
-
-            training_data.append(male_sent)
-            # formatted_data["Sentence"].append(male_sent)
-            # formatted_data['Gender'].append('male')
-            training_data.append(female_sent)
-            # formatted_data["Sentence"].append(female_sent)
-            # formatted_data['Gender'].append('female')
-            training_data.append(neutral_sent)
-            # formatted_data["Sentence"].append(neutral_sent)
-            # formatted_data['Gender'].append('neutral')
-            training_data.append(male_sent_some1)
-            # formatted_data["Sentence"].append(male_sent_some1)
-            # formatted_data['Gender'].append('male')
-            training_data.append(female_sent_some1)
-            # formatted_data["Sentence"].append(female_sent_some1)
-            # formatted_data['Gender'].append('female')
-            training_data.append(neutral_sent_some1)
-            # formatted_data["Sentence"].append(neutral_sent_some1)
-            # formatted_data['Gender'].append('neutral')
-            for i in range(6):
-                # formatted_data["Ocuppation Race"].append(race1)
-                # formatted_data["Other Participant Race"].append(race2)
-                training_answers.append(answer)
+        if count % 3 == 0:
+            sent = male_sent
+            some1 = male_sent_some1
+        elif count % 3 == 1:
+            sent = female_sent
+            some1 = female_sent_some1
         else:
-            for race1 in races:
-                for race2 in races:
-                    occupation, other_participant, answer, sentence = s
-                    occupation = f"{race1} {occupation}"
-                    other_participant = f"{race2} {other_participant}"
+            sent = neutral_sent
+            some1 = neutral_sent_some1
 
-                    male_sent, female_sent, neutral_sent = generate(
-                        occupation, other_participant, answer, sentence)
-                    male_sentid, female_sentid, neutral_sentid = [occupation+'.'+other_participant+'.'+str(
-                        answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
+        if answer:
+            training_participant_sent.append(sent)
+            training_participant_some1.append(some1)
+        else:
+            training_occupation_sent.append(sent)
+            training_occupation_some1.append(some1)
 
-                    male_sent_some1, female_sent_some1, neutral_sent_some1 = generate(
-                        occupation, other_participant, answer, sentence, someone=True)
-                    male_sentid_some1, female_sentid_some1, neutral_sentid_some1 = [
-                        occupation+'.'+"someone"+'.'+str(answer)+'.'+gender+".txt" for gender in ["male", "female", "neutral"]]
-
-                    training_data.append(male_sent)
-                    # formatted_data["Sentence"].append(male_sent)
-                    # formatted_data['Gender'].append('male')
-                    training_data.append(female_sent)
-                    # formatted_data["Sentence"].append(female_sent)
-                    # formatted_data['Gender'].append('female')
-                    training_data.append(neutral_sent)
-                    # formatted_data["Sentence"].append(neutral_sent)
-                    # formatted_data['Gender'].append('neutral')
-                    training_data.append(male_sent_some1)
-                    # formatted_data["Sentence"].append(male_sent_some1)
-                    # formatted_data['Gender'].append('male')
-                    training_data.append(female_sent_some1)
-                    # formatted_data["Sentence"].append(female_sent_some1)
-                    # formatted_data['Gender'].append('female')
-                    training_data.append(neutral_sent_some1)
-                    # formatted_data["Sentence"].append(neutral_sent_some1)
-                    # formatted_data['Gender'].append('neutral')
-                    for i in range(6):
-                        # formatted_data["Ocuppation Race"].append(race1)
-                        # formatted_data["Other Participant Race"].append(race2)
-                        training_answers.append(answer)
-
-    for s in S[split_point:]:
         for race1 in races:
             for race2 in races:
-                occupation, other_participant, answer, sentence = s
-                occupation = f"{race1} {occupation}"
-                other_participant = f"{race2} {other_participant}"
+                occupation = f"{race1} {_occupation}"
+                other_participant = f"{race2} {_other_participant}"
 
                 male_sent, female_sent, neutral_sent = generate(
                     occupation, other_participant, answer, sentence)
@@ -206,8 +163,7 @@ def get_formatted_sentences(train_test_split=0.8, race_blind=True, to_print=Fals
     data_frame = pandas.DataFrame(formatted_data)
     data_frame.to_csv('formatted_data_split.csv')
 
-    return [training_data, training_answers], [testing_data, testing_answers]
-    return data, answers
+    return [training_participant_sent, training_participant_some1, training_occupation_sent, training_occupation_some1], [testing_data, testing_answers]
 
 
 if __name__ == "__main__":
